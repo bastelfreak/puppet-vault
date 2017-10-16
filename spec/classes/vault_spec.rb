@@ -64,8 +64,7 @@ describe 'vault' do
             .with_owner('vault')
             .with_group('vault')
             .with_content(/"backend":\s*{\s*"file":\s*{\s*"path":\s*"\/data\/vault"/)
-            .with_content(/"listener":\s*{\s*"tcp":/)
-            .with_content(/"address":\s*"127.0.0.1:8200"/)
+            .with_content(/"listener":\s*{"tcp":\s*{"address":\s*"127.0.0.1:8200"/)
             .with_content(/"tls_disable":\s*1/)
         }
 
@@ -134,6 +133,28 @@ describe 'vault' do
 
           it { should contain_package('vault') }
         end
+      end
+
+      context "when specifying multiple listeners" do
+        let(:params) {{
+          :backend => {
+            'file' => {
+              'path' => '/data/vault'
+            }
+          },
+          :listener => [
+            { 'tcp' => { 'address' => '127.0.0.1:8200' } },
+            { 'tcp' => { 'address' => '0.0.0.0:8200' } },
+          ]
+        }}
+
+        it {
+          is_expected.to contain_file('/etc/vault/config.json')
+            .with_content(/"listener":\s*\[.*\]/)
+            .with_content(/"tcp":\s*{"address":\s*"127.0.0.1:8200"/)
+            .with_content(/"tcp":\s*{"address":\s*"0.0.0.0:8200"/)
+        }
+
       end
 
       context "when specifying manage_service" do
@@ -434,16 +455,10 @@ describe 'vault' do
     end
     context 'with mlock disabled' do
       let(:params) {{
-        :disable_mlock   => true,
-        :backend => {
+        :disable_mlock => true,
+        :backend       => {
           'file' => {
             'path' => '/data/vault'
-          }
-        },
-        :listener => {
-          'tcp' => {
-            'address'     => '127.0.0.1:8200',
-            'tls_disable' => 1,
           }
         }
       }}
@@ -699,12 +714,6 @@ describe 'vault' do
                         :backend => {
                           'file' => {
                             'path' => '/data/vault'
-                          }
-                        },
-                        :listener => {
-                          'tcp' => {
-                            'address'     => '127.0.0.1:8200',
-                            'tls_disable' => 1,
                           }
                         }
                       }}

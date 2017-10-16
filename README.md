@@ -89,14 +89,14 @@ By default, with no parameters the module will configure vault with some sensibl
 { 'file' => { 'path' => '/var/lib/vault' }}
 ```
 
-* `listener`: A hash containing the listeniner configuration, default:
+* `listener`: A hash or array of hashes containing the listener configuration(s), default:
 
 ```
 {
-   'tcp' => {
-      'address' => '127.0.0.1:8200',
-      'tls_disable' => 1,
-    }
+  'tcp' => {
+    'address'     => '127.0.0.1:8200',
+    'tls_disable' => 1,
+  }
 }
 ```
 
@@ -123,12 +123,12 @@ class { '::vault':
       path => '/tmp',
     }
   },
-  listener => {
+  listener => [{
     tcp => {
       address     => '127.0.0.1:8200',
       tls_disable => 0,
     }
-  }
+  }]
 }
 ```
 
@@ -141,9 +141,9 @@ vault::backend:
     path: /tmp
 
 vault::listener:
-  tcp:
-    address: 127.0.0.1:8200
-    tls_disable: 0
+  - tcp:
+      address: 127.0.0.1:8200
+      tls_disable: 0
 
 vault::default_lease_ttl: 720h
 ```

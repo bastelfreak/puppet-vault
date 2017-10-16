@@ -100,8 +100,12 @@ class vault (
 ) inherits ::vault::params {
 
   validate_hash($backend)
-  validate_hash($listener)
   validate_hash($extra_config)
+
+  case type3x($listener) {
+    'array', 'hash': { }
+    default: { fail('$listener must be an array') }
+  }
 
   if $ha_backend {
     validate_hash($ha_backend)
